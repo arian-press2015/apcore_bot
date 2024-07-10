@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 
@@ -9,7 +10,7 @@ import (
 
 func main() {
 	botToken := "7312956632:AAGc_wP8qjEeJvByBV3falkqPdZ_hd9wxFY"
-	webhookURL := "https://cafe-ro.com/bot"
+	webhookURL := "https://cafe-ro.com/bot/"
 
 	bot, err := tgbotapi.NewBotAPI(botToken)
 	if err != nil {
@@ -38,12 +39,32 @@ func main() {
 		log.Printf("Telegram callback failed: %s", info.LastErrorMessage)
 	}
 
-	updates := bot.ListenForWebhook("/" + bot.Token)
+	http.HandleFunc("/"+bot.Token, func(w http.ResponseWriter, r *http.Request) {
+		var update tgbotapi.Update
+		if err := json.NewDecoder(r.Body).Decode(&update); err != nil {
+			log.Printf("Failed to decode update: %v", err)
+			http.Error(w, "Failed to decode update", http.StatusBadRequest)
+			return
+		}
+
+		// Process the update based on its type (e.g., message, callback query)
+		if update.Message != nil {
+			log.Printf("Received message: %s", update.Message.Text)
+
+			// Example: Echo the received message back to the sender
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
+			if _, err := bot.Send(msg); err != nil {
+				log.Printf("Error sending message: %v", err)
+				http.Error(w, "Failed to send message", http.StatusInternalServerError)
+				return
+			}
+		}
+
+		// Respond to Telegram with a 200 OK status
+		w.WriteHeader(http.StatusOK)
+	})
 	http.ListenAndServe(":4000", nil)
 
-	for update := range updates {
-		log.Printf("%+v\n", update)
-	}
 }
 
 // func main() {
