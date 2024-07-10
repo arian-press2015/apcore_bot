@@ -47,16 +47,45 @@ func main() {
 			return
 		}
 
-		// Process the update based on its type (e.g., message, callback query)
+		// Process the update based on its type
 		if update.Message != nil {
-			log.Printf("Received message: %s", update.Message.Text)
+			// Handle incoming messages
+			switch update.Message.Command() {
+			case "start":
+				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Welcome! Use the custom keyboard to navigate.")
 
-			// Example: Echo the received message back to the sender
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
-			if _, err := bot.Send(msg); err != nil {
-				log.Printf("Error sending message: %v", err)
-				http.Error(w, "Failed to send message", http.StatusInternalServerError)
-				return
+				keyboard := tgbotapi.NewReplyKeyboard(
+					tgbotapi.NewKeyboardButtonRow(
+						tgbotapi.NewKeyboardButton("Option 1"),
+						tgbotapi.NewKeyboardButton("Option 2"),
+					),
+				)
+
+				msg.ReplyMarkup = keyboard
+
+				if _, err := bot.Send(msg); err != nil {
+					log.Printf("Error sending message: %v", err)
+					http.Error(w, "Failed to send message", http.StatusInternalServerError)
+					return
+				}
+
+			case "help":
+				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Available commands:\n/start - start the bot\n/help - see this help message")
+
+				if _, err := bot.Send(msg); err != nil {
+					log.Printf("Error sending message: %v", err)
+					http.Error(w, "Failed to send message", http.StatusInternalServerError)
+					return
+				}
+
+			default:
+				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "I don't know that command.")
+
+				if _, err := bot.Send(msg); err != nil {
+					log.Printf("Error sending message: %v", err)
+					http.Error(w, "Failed to send message", http.StatusInternalServerError)
+					return
+				}
 			}
 		}
 
