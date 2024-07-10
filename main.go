@@ -9,7 +9,7 @@ import (
 
 func main() {
 	botToken := "7312956632:AAGc_wP8qjEeJvByBV3falkqPdZ_hd9wxFY"
-	webhookURL := "cafe-ro.com/bot"
+	webhookURL := "https://cafe-ro.com/bot"
 
 	bot, err := tgbotapi.NewBotAPI(botToken)
 	if err != nil {
@@ -17,6 +17,7 @@ func main() {
 	}
 
 	bot.Debug = true
+	log.Printf("Authorized on account %s", bot.Self.UserName)
 
 	webhook, err := tgbotapi.NewWebhook(webhookURL + bot.Token)
 	if err != nil {
@@ -28,14 +29,20 @@ func main() {
 		log.Panic(err)
 	}
 
+	info, err := bot.GetWebhookInfo()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if info.LastErrorDate != 0 {
+		log.Printf("Telegram callback failed: %s", info.LastErrorMessage)
+	}
+
 	updates := bot.ListenForWebhook("/" + bot.Token)
 	http.ListenAndServe(":4000", nil)
 
 	for update := range updates {
-		if update.Message != nil {
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
-			bot.Send(msg)
-		}
+		log.Printf("%+v\n", update)
 	}
 }
 
