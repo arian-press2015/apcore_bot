@@ -24,15 +24,26 @@ func main() {
 	updates := bot.GetUpdatesChan(u)
 
 	for update := range updates {
-		if update.Message == nil {
-			continue
+		if update.Message != nil {
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Choose an option:")
+			var keyboard = tgbotapi.NewInlineKeyboardMarkup(
+				tgbotapi.NewInlineKeyboardRow(
+					tgbotapi.NewInlineKeyboardButtonData("Option 1", "opt1"),
+					tgbotapi.NewInlineKeyboardButtonData("Option 2", "opt2"),
+				),
+			)
+			msg.ReplyMarkup = keyboard
+			bot.Send(msg)
+		} else if update.CallbackQuery != nil {
+			callback := tgbotapi.NewCallback(update.CallbackQuery.ID, update.CallbackQuery.Data)
+			if _, err := bot.Request(callback); err != nil {
+				log.Println(err)
+			}
+
+			msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, "You chose: "+update.CallbackQuery.Data)
+			if _, err := bot.Send(msg); err != nil {
+				log.Println(err)
+			}
 		}
-
-		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
-
-		msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
-		msg.ReplyToMessageID = update.Message.MessageID
-
-		bot.Send(msg)
 	}
 }
