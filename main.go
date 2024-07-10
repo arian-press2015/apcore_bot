@@ -25,24 +25,26 @@ func main() {
 
 	for update := range updates {
 		if update.Message != nil {
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Choose an option:")
-			var keyboard = tgbotapi.NewInlineKeyboardMarkup(
-				tgbotapi.NewInlineKeyboardRow(
-					tgbotapi.NewInlineKeyboardButtonData("Option 1", "opt1"),
-					tgbotapi.NewInlineKeyboardButtonData("Option 2", "opt2"),
-				),
-			)
-			msg.ReplyMarkup = keyboard
-			bot.Send(msg)
-		} else if update.CallbackQuery != nil {
-			callback := tgbotapi.NewCallback(update.CallbackQuery.ID, update.CallbackQuery.Data)
-			if _, err := bot.Request(callback); err != nil {
-				log.Println(err)
-			}
+			switch update.Message.Command() {
+			case "start":
+				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Welcome! Use the custom keyboard to navigate.")
 
-			msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, "You chose: "+update.CallbackQuery.Data)
-			if _, err := bot.Send(msg); err != nil {
-				log.Println(err)
+				keyboard := tgbotapi.NewReplyKeyboard(
+					tgbotapi.NewKeyboardButtonRow(
+						tgbotapi.NewKeyboardButton("Option 1"),
+						tgbotapi.NewKeyboardButton("Option 2"),
+					),
+				)
+
+				msg.ReplyMarkup = keyboard
+
+				bot.Send(msg)
+			case "help":
+				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Available commands:\n/start - start the bot\n/help - see this help message")
+				bot.Send(msg)
+			default:
+				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "I don't know that command.")
+				bot.Send(msg)
 			}
 		}
 	}
