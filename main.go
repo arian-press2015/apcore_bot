@@ -47,3 +47,17 @@ func main() {
 		}
 	}
 }
+
+// if update.Message != nil {
+// 	switch update.Message.Command() {
+// 	case "start":
+// 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Welcome to the bot! Type /help to see available commands.")
+// 		bot.Send(msg)
+// 	case "help":
+// 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Available commands:\n/start - start the bot\n/help - see this help message")
+// 		bot.Send(msg)
+// 	default:
+// 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "I don't know that command.")
+// 		bot.Send(msg)
+// 	}
+// }
