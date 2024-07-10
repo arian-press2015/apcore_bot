@@ -63,3 +63,24 @@ func main() {
 // 		bot.Send(msg)
 // 	}
 // }
+
+// user auth
+
+// var authorizedUsers = map[int64]bool{
+//     12345678: true, // Replace with actual user IDs
+//     87654321: true,
+// }
+//
+// for update := range updates {
+// 	if update.Message != nil {
+// 		if _, authorized := authorizedUsers[update.Message.From.ID]; !authorized {
+// 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "You are not authorized to use this bot.")
+// 			bot.Send(msg)
+// 			continue
+// 		}
+
+// 		// Process authorized user's message
+// 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Welcome, authorized user!")
+// 		bot.Send(msg)
+// 	}
+// }
