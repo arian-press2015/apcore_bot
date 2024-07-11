@@ -11,11 +11,13 @@ import (
 )
 
 type HTTPServer struct {
-	Bot *bot.TelegramBot
+	Bot    *bot.TelegramBot
+	Config *config.Config
 }
 
-func NewHTTPServer(config config.Config, bot *bot.TelegramBot) *HTTPServer {
-	return &HTTPServer{Bot: bot}
+func NewHTTPServer(bot *bot.TelegramBot, config *config.Config) *HTTPServer {
+	return &HTTPServer{Bot: bot, Config: config}
+}
 }
 
 func (s *HTTPServer) HandleWebhook(w http.ResponseWriter, r *http.Request) {
