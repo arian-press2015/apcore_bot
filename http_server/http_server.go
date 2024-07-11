@@ -18,7 +18,6 @@ type HTTPServer struct {
 func NewHTTPServer(bot *bot.TelegramBot, config *config.Config) *HTTPServer {
 	return &HTTPServer{Bot: bot, Config: config}
 }
-}
 
 func (s *HTTPServer) HandleWebhook(w http.ResponseWriter, r *http.Request) {
 	var update tgbotapi.Update
