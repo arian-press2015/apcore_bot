@@ -47,11 +47,9 @@ func main() {
 			return
 		}
 
-		// Process the update based on its type (e.g., message, callback query)
 		if update.Message != nil {
 			log.Printf("Received message: %s", update.Message.Text)
 
-			// Example: Echo the received message back to the sender
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
 			if _, err := bot.Send(msg); err != nil {
 				log.Printf("Error sending message: %v", err)
@@ -60,7 +58,6 @@ func main() {
 			}
 		}
 
-		// Respond to Telegram with a 200 OK status
 		w.WriteHeader(http.StatusOK)
 	})
 	http.ListenAndServe(":4000", nil)
