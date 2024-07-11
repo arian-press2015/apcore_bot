@@ -27,10 +27,10 @@ func main() {
 	<-app.Done()
 }
 
-func RunBot(lifecycle fx.Lifecycle, bot *bot.TelegramBot, server *httpserver.HTTPServer) {
+func RunBot(lifecycle fx.Lifecycle, server *httpserver.HTTPServer) {
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			bot.Run(server.HandleWebhook)
+			server.Start()
 			return nil
 		},
 		OnStop: func(context.Context) error {

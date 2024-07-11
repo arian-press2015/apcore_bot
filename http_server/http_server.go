@@ -2,6 +2,7 @@ package httpserver
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -17,6 +18,15 @@ type HTTPServer struct {
 
 func NewHTTPServer(bot *bot.TelegramBot, config *config.Config) *HTTPServer {
 	return &HTTPServer{Bot: bot, Config: config}
+}
+
+func (s *HTTPServer) Start() error {
+	http.HandleFunc(s.Bot.GetWebhookURL(), s.HandleWebhook)
+	
+	addr := fmt.Sprintf(":%d", s.Config.Port)
+
+	log.Printf("HTTP server listening on %s", addr)
+	return http.ListenAndServe(addr, nil)
 }
 
 func (s *HTTPServer) HandleWebhook(w http.ResponseWriter, r *http.Request) {

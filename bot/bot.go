@@ -1,9 +1,7 @@
 package bot
 
 import (
-	"fmt"
 	"log"
-	"net/http"
 
 	"github.com/arian-press2015/apcore_bot/config"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -22,21 +20,18 @@ func NewTelegramBot(config *config.Config) (*TelegramBot, error) {
 	}
 	bot.Debug = true
 	log.Printf("Authorized on account %s", bot.Self.UserName)
-	return &TelegramBot{Bot: bot, Config: config}, nil
-}
 
-func (b *TelegramBot) Run(handler func(http.ResponseWriter, *http.Request)) {
-	webhook, err := tgbotapi.NewWebhook(b.Config.WebhookURL + b.Bot.Token)
+	webhook, err := tgbotapi.NewWebhook(config.WebhookURL + bot.Token)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	_, err = b.Bot.Request(webhook)
+	_, err = bot.Request(webhook)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	info, err := b.Bot.GetWebhookInfo()
+	info, err := bot.GetWebhookInfo()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -45,10 +40,9 @@ func (b *TelegramBot) Run(handler func(http.ResponseWriter, *http.Request)) {
 		log.Printf("Telegram callback failed: %s", info.LastErrorMessage)
 	}
 
-	updates := b.Bot.ListenForWebhook("/" + b.Bot.Token)
-	http.HandleFunc("/"+b.Bot.Token, handler)
-	go http.ListenAndServe(fmt.Sprintf(":%d", b.Config.Port), nil)
-	for update := range updates {
-		log.Printf("update: %+v\n", update)
-	}
+	return &TelegramBot{Bot: bot, Config: config}, nil
+}
+
+func (b *TelegramBot) GetWebhookURL() string {
+	return "/" + b.Bot.Token
 }
