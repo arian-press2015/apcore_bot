@@ -10,6 +10,7 @@ import (
 type Config struct {
 	BotToken   string `mapstructure:"bot_token" validate:"required"`
 	WebhookURL string `mapstructure:"webhook_url" validate:"required,url"`
+	Port       int    `mapstructure:"port" validate:"number,gte=0,lte=65535"`
 }
 
 func NewConfig() (*Config, error) {
